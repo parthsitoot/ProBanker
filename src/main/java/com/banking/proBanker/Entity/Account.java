@@ -1,4 +1,4 @@
-package com.webapp.bankingportal.entity;
+package com.banking.proBanker.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
