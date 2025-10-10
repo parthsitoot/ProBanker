@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.banking</groupId>
-	<artifactId>ProBanker</artifactId>
+	<artifactId>SE Project</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>FinSpring</name>
 	<description>Modern Banking Application built with Spring Boot</description>
