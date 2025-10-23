@@ -1,4 +1,4 @@
 package com.banking.proBanker.Config;
 
-public class SecurityConfig {
+public class WebSecurityConfig {
 }
