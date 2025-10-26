@@ -76,14 +76,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         val token = requestTokenHeader.substring(7);
         String username = null;
 
-        try {
-            tokenService.validateToken(token);
-            username = tokenService.getUsernameFromToken(token);
-        } catch (InvalidTokenException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                    e.getMessage());
-            return;
-        }
+//        try {
+//            tokenService.validateToken(token);
+//            username = tokenService.getUsernameFromToken(token);
+//        } catch (InvalidTokenException e) {
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+//                    e.getMessage());
+//            return;
+//        }
 
         val userDetails = userDetailsService.loadUserByUsername(username);
         val authToken = new UsernamePasswordAuthenticationToken(
