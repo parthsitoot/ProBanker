@@ -8,6 +8,7 @@ import com.banking.proBanker.Utilities.ApiMessages;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -32,29 +33,31 @@ public class TokenServiceImpl implements TokenService{
 
     @Override
     public String generateToken(UserDetails userDetails) {
-        return "";
-    }
-
-    @Override
-    public String generateToken(UserDetails userDetails, Date expiry) {
         log.info("Generation token for user: " + userDetails.getUsername());
         return doGenerateToken(userDetails,
                 new Date(System.currentTimeMillis() + expiration));
     }
 
     @Override
+    public String generateToken(UserDetails userDetails, Date expiry) {
+        log.info("Generation token for user: " + userDetails.getUsername());
+        return doGenerateToken(userDetails, expiry);
+    }
+
+    @Override
     public String getUsernameFromToken(String token) throws InvalidTokenException {
-        return "";
+        return getClaimFromToken(token, Claims::getSubject);
     }
 
     @Override
     public Date getExpirationDateFromToken(String token) throws InvalidTokenException {
-        return null;
+        return getClaimFromToken(token, Claims::getExpiration);
     }
 
     @Override
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimResolver) throws InvalidTokenException {
-        return null;
+        val claims = getAllClaimsFromToken(token);
+        return claimResolver.apply(claims);
     }
 
     @Override
