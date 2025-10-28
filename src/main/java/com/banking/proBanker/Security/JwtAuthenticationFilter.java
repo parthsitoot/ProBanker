@@ -3,6 +3,7 @@ package com.banking.proBanker.Security;
 import java.io.IOException;
 
 import com.banking.proBanker.Exceptions.InvalidTokenException;
+import com.banking.proBanker.Service.TokenService;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,8 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-//import com.banking.proBanker.service.TokenService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,7 +32,7 @@ import lombok.val;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
-//    private final TokenService tokenService;
+    private final TokenService tokenService;
 
     /**
      * Performs the filtering for each request
@@ -76,14 +75,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         val token = requestTokenHeader.substring(7);
         String username = null;
 
-//        try {
-//            tokenService.validateToken(token);
-//            username = tokenService.getUsernameFromToken(token);
-//        } catch (InvalidTokenException e) {
-//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-//                    e.getMessage());
-//            return;
-//        }
+        try {
+            tokenService.validateToken(token);
+            username = tokenService.getUsernameFromToken(token);
+        } catch (InvalidTokenException e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    e.getMessage());
+            return;
+        }
 
         val userDetails = userDetailsService.loadUserByUsername(username);
         val authToken = new UsernamePasswordAuthenticationToken(
