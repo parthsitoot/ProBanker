@@ -1,5 +1,6 @@
 package com.banking.proBanker.Service;
 
+import com.banking.proBanker.Entity.Token;
 import com.banking.proBanker.Exceptions.InvalidTokenException;
 import com.banking.proBanker.Repository.AccountRepository;
 import com.banking.proBanker.Repository.TokenRepository;
@@ -62,17 +63,35 @@ public class TokenServiceImpl implements TokenService{
 
     @Override
     public void saveToken(String token) throws InvalidTokenException {
+        if (tokenRepository.findByToken(token) != null) {
+            throw new InvalidTokenException(ApiMessages.TOKEN_ALREADY_EXISTS_ERROR.getMessage());
+        }
+        val account = accountRepository.findByAccountNumber(
+                getUsernameFromToken(token)
+        );
 
+        log.info("Saving token for account: " + account.getAccountNumber());
+
+        val tokenObj = new Token(
+                token,
+                getExpirationDateFromToken(token),
+                account
+        );
+        tokenRepository.save(tokenObj);
     }
 
     @Override
     public void validateToken(String token) throws InvalidTokenException {
-
+        if (tokenRepository.findByToken(token) == null) {
+            throw new InvalidTokenException(ApiMessages.TOKEN_NOT_FOUND_ERROR.getMessage());
+        }
     }
 
     @Override
     public void invalidateToken(String token) {
-
+        if (tokenRepository.findByToken(token) != null) {
+            tokenRepository.deleteByToken(token);
+        }
     }
 
     //NOT PRESENT IN INTERFACE
