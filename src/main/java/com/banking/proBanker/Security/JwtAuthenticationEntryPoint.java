@@ -33,6 +33,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
      * @throws ServletException If a servlet exception occurs
      */
 
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException authException) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
