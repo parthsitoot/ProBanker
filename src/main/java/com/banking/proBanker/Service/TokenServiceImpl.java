@@ -12,10 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.function.Function;
+
+import static org.springframework.security.core.userdetails.User.withUsername;
 
 @Service
 @Slf4j
@@ -43,6 +46,15 @@ public class TokenServiceImpl implements TokenService{
     public String generateToken(UserDetails userDetails, Date expiry) {
         log.info("Generation token for user: " + userDetails.getUsername());
         return doGenerateToken(userDetails, expiry);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String accountNumber) throws UsernameNotFoundException {
+        val user = userRepository.findUserByAccountNumber(accountNumber)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        String.format(ApiMessages.USER_NOT_FOUND_BY_ACCOUNT.getMessage(), accountNumber)));
+
+        return withUsername(accountNumber).password(user.getPassword()).build();
     }
 
     @Override

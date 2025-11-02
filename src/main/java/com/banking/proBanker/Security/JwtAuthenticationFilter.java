@@ -9,11 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.hibernate.grammars.hql.HqlParser;
-import org.springframework.boot.micrometer.observation.autoconfigure.ObservationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -26,6 +23,7 @@ import java.io.IOException;
  * JWT Authentication Filter
  * This filter intercepts incoming requests to authenticate user based on JWT tokens.
  * It extends OncePerRequestFilter at ensure it's executed once per request.
+ * @author Parth Sitoot
  */
 
 @Component
@@ -42,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      *
      * @throws ServletException If a servlet-specific error occurs
      * @throws IOException     If an I/O exception occurs
+     * @author Parth Sitoot
      */
 
     @Override
@@ -62,8 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
 
+        assert requestTokenHeader != null;
         if (!requestTokenHeader.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+            response.sendError( HttpServletResponse.SC_UNAUTHORIZED,
                     "Token must start with 'Bearer '");
 
             return;
