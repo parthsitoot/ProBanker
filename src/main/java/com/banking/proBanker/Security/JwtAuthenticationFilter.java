@@ -61,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
 
-        assert requestTokenHeader != null;
         if (!requestTokenHeader.startsWith("Bearer ")) {
             response.sendError( HttpServletResponse.SC_UNAUTHORIZED,
                     "Token must start with 'Bearer '");
