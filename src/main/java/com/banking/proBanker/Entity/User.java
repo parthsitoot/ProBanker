@@ -43,7 +43,7 @@ public class User {
 
     // Establishing a one-to-one relationship with the account
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private com.banking.proBanker.Entity.Account account;
+    private Account account;
 
 }
 

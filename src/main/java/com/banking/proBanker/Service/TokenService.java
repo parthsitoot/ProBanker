@@ -3,12 +3,13 @@ package com.banking.proBanker.Service;
 import com.banking.proBanker.Exceptions.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Date;
 import java.util.function.Function;
 
-public interface TokenService {
+public interface TokenService extends UserDetailsService {
     public String generateToken (UserDetails userDetails);
 
     public String generateToken (UserDetails userDetails, Date expiry);

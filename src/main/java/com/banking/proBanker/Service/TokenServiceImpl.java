@@ -24,10 +24,10 @@ import static org.springframework.security.core.userdetails.User.withUsername;
 @Slf4j
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService{
-    @Value("${jwt_secret}")
+    @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt_expiration}")
+    @Value("${jwt.expiration}")
     private String expiration;
 
     private final UserRepository userRepository;
@@ -50,7 +50,7 @@ public class TokenServiceImpl implements TokenService{
 
     @Override
     public UserDetails loadUserByUsername(String accountNumber) throws UsernameNotFoundException {
-        val user = userRepository.findUserByAccountNumber(accountNumber)
+        val user = userRepository.findByAccountAccountNumber(accountNumber)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         String.format(ApiMessages.USER_NOT_FOUND_BY_ACCOUNT.getMessage(), accountNumber)));
 
