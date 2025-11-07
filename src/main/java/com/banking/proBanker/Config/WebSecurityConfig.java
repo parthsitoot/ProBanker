@@ -1,11 +1,7 @@
 package com.banking.proBanker.Config;
 
-
-import com.banking.proBanker.Security.JwtAuthenticationEntryPoint;
 import com.banking.proBanker.Security.JwtAuthenticationFilter;
 import com.banking.proBanker.Service.TokenService;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,12 +18,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.banking.proBanker.Security.*;
+import jakarta.servlet.http.HttpServletResponse;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    public static final String[] PUBLIC_URLS = {
+
+    private static final String[] PUBLIC_URLS = {
             "/api/users/register",
             "/api/users/login",
             "/api/auth/password-reset/verify-otp",
@@ -35,11 +37,12 @@ public class WebSecurityConfig {
             "/api/auth/password-reset",
             "/api/users/generate-otp",
             "/api/users/verify-otp",
-            "swagger-ui.html",
+            "/swagger-ui.html",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/actuator/**"
     };
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final TokenService tokenService;
