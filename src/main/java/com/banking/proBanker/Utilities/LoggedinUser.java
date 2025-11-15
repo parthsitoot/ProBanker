@@ -9,7 +9,6 @@ public class LoggedinUser {
     /**
      * Returns the account number of currently logged-in user.
      * If there is no user logged-in, it will throw an exception.
-     *
      * @return account number of currently logged-in user.
      * @throws NotFoundException If there is no user logged-in.
      * @author Parth Sitoot
