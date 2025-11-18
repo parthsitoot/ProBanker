@@ -17,7 +17,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         val securitySchemeName = "Bearer";
         return new OpenAPI()
-                .info(new Info().title("Banking Portal API")
+                .info(new Info().title("proBanker API Documentation")
                         .description("This is the auth service use to validate the user.")
                         .version("v0.0.1")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
