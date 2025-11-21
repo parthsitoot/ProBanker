@@ -9,12 +9,9 @@ import com.banking.proBanker.Utilities.ApiMessages;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.beans.Encoder;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -56,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
             throw new UnauthorizedException(ApiMessages.PIN_ALREADY_EXISTS.getMessage());
         } else if (pin == null || pin.isEmpty()) {
             throw new InvalidPinException(ApiMessages.PIN_EMPTY_ERROR.getMessage());
-        } else if (!pin.matches("[0-9](0-9)")) {
+        } else if (!pin.matches("[0-9]{4}")) {
             throw new InvalidPinException(ApiMessages.PIN_FORMAT_INVALID_ERROR.getMessage());
         }
 
@@ -66,17 +63,36 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updatePin(String accountNumber, String oldPin, String newPin, String password) {
+        validatePassword(accountNumber, password);
+        validatePin(accountNumber, oldPin);
 
+        if (newPin == null || newPin.isEmpty()) {
+            throw new InvalidPinException(ApiMessages.PIN_INVALID_ERROR.getMessage());
+        } else if (newPin.matches("[0-9]{4}")){
+            throw new InvalidPinException(ApiMessages.PIN_INVALID_ERROR.getMessage());
+        }
+        val account = accountRepository.findByAccountNumber(accountNumber);
+        account.setPin(passwordEncoder.encode(newPin));
+        accountRepository.save(account);
     }
 
     @Override
     public void cashDeposit(String accountNumber, String pin, double amount) {
-
+        validatePin(accountNumber, pin);
+        val account = accountRepository.findByAccountNumber(accountNumber);
+        double balance = account.getBalance();
+        balance += amount;
+        account.setBalance(amount);
+        accountRepository.save(account);
     }
 
     @Override
     public void cashWithdraw(String accountNumber, String pin, double amount) {
-
+        validatePin(accountNumber, pin);
+        val account = accountRepository.findByAccountNumber(accountNumber);
+        if (amount > account.getBalance()) {
+            throw new InvalidAmountException()
+        }
     }
 
     @Override
@@ -96,7 +112,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private static void validatePassword (String accountNumber, String password) {
-        Account account = accountRepository.findByAccountNumber(accountNumber);
+        val account = accountRepository.findByAccountNumber(accountNumber);
         if (account == null) {
             throw new NotFoundException(ApiMessages.ACCOUNT_NOT_FOUND.getMessage());
         }
@@ -107,6 +123,33 @@ public class AccountServiceImpl implements AccountService {
 
         if (!passwordEncoder.matches(password, account.getUser().getPassword())) {
             throw new UnauthorizedException(ApiMessages.PASSWORD_INVALID_ERROR.getMessage());
+        }
+    }
+
+    private static void validatePin (String accountNumber, String pin) {
+        val account = accountRepository.findByAccountNumber(accountNumber);
+        if (account == null) {
+            throw new NotFoundException(ApiMessages.ACCOUNT_NOT_FOUND.getMessage());
+        }
+
+        if (pin == null || pin.isEmpty()) {
+            throw new UnauthorizedException(ApiMessages.PIN_INVALID_ERROR.getMessage());
+        } else if (passwordEncoder.matches(pin, account.getPin())) {
+            throw new UnauthorizedException(ApiMessages.PIN_INVALID_ERROR.getMessage());
+        }
+    }
+
+    private void validateAmount(double amount) {
+        if (amount <= 0) {
+            throw new InvalidAmountException(ApiMessages.AMOUNT_NEGATIVE_ERROR.getMessage());
+        }
+
+        if (amount % 100 != 0) {
+            throw new InvalidAmountException(ApiMessages.AMOUNT_NOT_MULTIPLE_OF_100_ERROR.getMessage());
+        }
+
+        if (amount > 100000) {
+            throw new InvalidAmountException(ApiMessages.AMOUNT_EXCEED_100_000_ERROR.getMessage());
         }
     }
 }
