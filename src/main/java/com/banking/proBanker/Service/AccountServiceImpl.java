@@ -2,9 +2,12 @@ package com.banking.proBanker.Service;
 
 
 import com.banking.proBanker.Entity.Account;
+import com.banking.proBanker.Entity.Transaction;
+import com.banking.proBanker.Entity.TransactionType;
 import com.banking.proBanker.Entity.User;
 import com.banking.proBanker.Exceptions.*;
 import com.banking.proBanker.Repository.AccountRepository;
+import com.banking.proBanker.Repository.TransactionRepository;
 import com.banking.proBanker.Utilities.ApiMessages;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +15,7 @@ import lombok.val;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -19,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
+    private static TransactionRepository transactionRepository;
     private static AccountRepository accountRepository;
     private static PasswordEncoder passwordEncoder;
 
@@ -82,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
         val account = accountRepository.findByAccountNumber(accountNumber);
         double balance = account.getBalance();
         balance += amount;
-        account.setBalance(amount);
+        account.setBalance(balance);
         accountRepository.save(account);
     }
 
@@ -91,13 +96,53 @@ public class AccountServiceImpl implements AccountService {
         validatePin(accountNumber, pin);
         val account = accountRepository.findByAccountNumber(accountNumber);
         if (amount > account.getBalance()) {
-            throw new InvalidAmountException()
+            throw new InsufficientBalanceException(ApiMessages.BALANCE_INSUFFICIENT_ERROR.getMessage());
         }
+
+        val newBalance = account.getBalance() - amount;
+        account.setBalance(newBalance);
+
+        val transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setSourceAccount(account);
+        transaction.setTransactionDate(new Date());
+        transaction.setTransactionType(TransactionType.CASH_WITHDRAWAL);
+        transactionRepository.save(transaction);
+        accountRepository.save(account);
     }
 
     @Override
     public void fundTransfer(String sourceAccountNumber, String destinationAccountNumber, String pin, double amount) {
+        validatePin(sourceAccountNumber, pin);
+        val sourceAccount = accountRepository.findByAccountNumber(sourceAccountNumber);
+        val destinationAccount = accountRepository.findByAccountNumber(destinationAccountNumber);
 
+        if (sourceAccountNumber == destinationAccountNumber) {
+            throw new FundTransferException(ApiMessages.CASH_TRANSFER_SAME_ACCOUNT_ERROR.getMessage());
+        }
+
+        if (destinationAccount == null) {
+            throw new AccountDoesNotExistException(ApiMessages.ACCOUNT_NOT_FOUND.getMessage());
+        }
+
+        if (sourceAccount.getBalance() < amount) {
+            throw new InsufficientBalanceException(ApiMessages.BALANCE_INSUFFICIENT_ERROR.getMessage());
+        }
+
+        sourceAccount.setBalance(sourceAccount.getBalance() - amount);
+
+        destinationAccount.setBalance(destinationAccount.getBalance() + amount);
+
+        accountRepository.save(sourceAccount);
+        accountRepository.save(destinationAccount);
+
+        val transaction = new Transaction();
+        transaction.setSourceAccount(sourceAccount);
+        transaction.setTargetAccount(destinationAccount);
+        transaction.setTransactionType(TransactionType.CASH_TRANSFER);
+        transaction.setTransactionDate(new Date());
+        transaction.setAmount(amount);
+        transactionRepository.save(transaction);
     }
 
     //External Functions
