@@ -2,6 +2,8 @@ package com.banking.proBanker.Service;
 
 import com.banking.proBanker.Entity.OtpInfo;
 import com.banking.proBanker.Exceptions.AccountDoesNotExistException;
+import com.banking.proBanker.Exceptions.InvalidOtpException;
+import com.banking.proBanker.Exceptions.InvalidTokenException;
 import com.banking.proBanker.Exceptions.OtpRetryLimitExceededException;
 import com.banking.proBanker.Repository.OtpInfoRepository;
 import com.banking.proBanker.Utilities.ApiMessages;
@@ -41,7 +43,11 @@ public class OtpServiceImpl implements OtpService{
 
     @Override
     public boolean validateOTP(String accountNumber, String otp) {
-        return false;
+        val otpInfo = otpInfoRepository.findByAccountNumberAndOtp(accountNumber, otp);
+        if (otpInfo == null) {
+            throw new InvalidOtpException(ApiMessages.OTP_INVALID_ERROR.getMessage());
+        }
+        return isOtpExpired(otpInfo);
     }
 
     @Override
@@ -53,7 +59,7 @@ public class OtpServiceImpl implements OtpService{
         val existingOtpInfo = otpInfoRepository.findByAccountNumber(accountNumber);
         if (existingOtpInfo == null) {
             incrementOtpAttempts(accountNumber);
-            return generateOtp(accountNumber);
+            return generateNewOtp(accountNumber);
         }
 
         validateOtpWithinRetryLimit(existingOtpInfo);

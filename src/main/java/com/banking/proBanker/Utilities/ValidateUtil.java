@@ -144,7 +144,7 @@ public class ValidateUtil {
         }
     }
 
-    public static void validateUserDetails(User user) {
+    public void validateUserDetails(User user) {
         validateUserDetailsNotEmpty(user);
 
         if (!isValidEmail(user.getEmail())) {
