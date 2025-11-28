@@ -3,23 +3,27 @@ package com.banking.proBanker.Service;
 import com.banking.proBanker.DTO.LoginRequest;
 import com.banking.proBanker.DTO.OtpRequest;
 import com.banking.proBanker.DTO.OtpVerificationRequest;
+import com.banking.proBanker.DTO.UserResponse;
 import com.banking.proBanker.Entity.User;
 import com.banking.proBanker.Exceptions.InvalidOtpException;
 import com.banking.proBanker.Exceptions.InvalidTokenException;
+import com.banking.proBanker.Exceptions.PasswordResetException;
 import com.banking.proBanker.Exceptions.UserInvalidException;
 import com.banking.proBanker.Mapper.UserMapper;
 import com.banking.proBanker.Repository.UserRepository;
 import com.banking.proBanker.Utilities.ApiMessages;
+import com.banking.proBanker.Utilities.JsonUtil;
+import com.banking.proBanker.Utilities.LoggedinUser;
 import com.banking.proBanker.Utilities.ValidateUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
@@ -48,37 +52,67 @@ public class UserServiceImpl implements UserService{
     @Override
     public ResponseEntity<String> registerUser(User user) {
         validationUtil.validateNewUser(user);
-
+        encodePassword(user);
+        val savedUser = saveUserWithAccount(user);
+        return ResponseEntity.ok(JsonUtil.toJSON(new UserResponse(savedUser)));
     }
 
     @Override
     public ResponseEntity<String> login(LoginRequest loginRequest, HttpServletRequest request) throws InvalidTokenException {
-        return null;
+        val user = authenticateUser(loginRequest);
+        sendLoginNotification(user, request.getRemoteAddr());
+        val token = generateAndSaveToken(user.getAccount().getAccountNumber());
+        return ResponseEntity.ok(String.format(ApiMessages.TOKEN_ISSUED_SUCCESS.getMessage(), token));
+
     }
 
     @Override
     public ResponseEntity<String> generateOtp(OtpRequest otpRequest) {
-        return null;
+        val user = getUserByIdentifier(otpRequest.identifier());
+        val otp = otpService.generateOtp(user.getAccount().getAccountNumber());
+        return sendOtpEmail(user, otp);
     }
 
     @Override
     public ResponseEntity<String> verifyOtpAndLogin(OtpVerificationRequest otpVerificationRequest) throws InvalidTokenException {
-        return null;
+        validateOtpRequest(otpVerificationRequest);
+        val user = getUserByIdentifier(otpVerificationRequest.identifier());
+        validateOtp(user, otpVerificationRequest.otp());
+        val token = generateAndSaveToken(user.getAccount().getAccountNumber());
+        return ResponseEntity.ok(String.format(ApiMessages.TOKEN_ISSUED_SUCCESS.getMessage(), token));
+
     }
 
     @Override
     public ResponseEntity<String> updateUser(User user) {
-        return null;
+        val accountNumber = LoggedinUser.getAccountNumber();
+        authenticateUser(accountNumber, user.getAccount().getAccountNumber());
+        val existingUser = getUserByAccountNumber(accountNumber);
+        userMapper.updateUser(existingUser, user);
+        val savedUser = saveUser(existingUser);
+        return ResponseEntity.ok(String.format(JsonUtil.toJSON(savedUser).toString()));
     }
 
     @Override
     public ModelAndView logout(String token) throws InvalidTokenException {
-        return null;
+        token = token.substring(7);
+        tokenService.validateToken(token);
+        tokenService.invalidateToken(token);
+
+        log.info("Logged out successfully: ", tokenService.getUsernameFromToken(token));
+        return new ModelAndView("redirect:/logout");
     }
 
     @Override
     public boolean resetPassword(User user, String newPassword) {
-        return false;
+        try {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            throw new PasswordResetException(ApiMessages.PASSWORD_RESET_FAILURE.getMessage(), e);
+        }
+
     }
 
     @Override
@@ -104,12 +138,16 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserByAccountNumber(String accountNo) {
-        return null;
+        return userRepository.findByAccountAccountNumber(accountNo)
+                .orElseThrow(() -> new UserInvalidException(
+                        String.format(ApiMessages.USER_NOT_FOUND_BY_ACCOUNT.getMessage(), accountNo)));
     }
 
     @Override
     public User getUserByEmail(String email) {
-        return null;
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        String.format(ApiMessages.USER_NOT_FOUND_BY_EMAIL.getMessage(), email)));
     }
 
     //Additional functions
@@ -179,12 +217,11 @@ public class UserServiceImpl implements UserService{
 
     private void updateuser (User existingUser, User newUser) {
         validationUtil.validateUserDetails(newUser);
-
         newUser.setPassword(existingUser.getPassword());
-        userMapper.userUpdate(existingUser, newUser);
+        userMapper.updateUser(existingUser, newUser);
     }
 
-    private CompletableFuture<Boolean> setLoginNotification (User user, String ip) {
+    private CompletableFuture<Boolean> sendLoginNotification (User user, String ip) {
         val loginTime = new Timestamp(System.currentTimeMillis()).toString();
 
         return geolocationService.getGeolocation(ip)
