@@ -1,10 +1,16 @@
 package com.banking.proBanker.DTO;
 
 import com.banking.proBanker.Entity.TransactionType;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import com.banking.proBanker.Entity.*;
 import java.util.Date;
 
+@Data
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class TransactionDto {
     private Long id;
     private double amount;
