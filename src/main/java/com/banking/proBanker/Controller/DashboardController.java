@@ -3,7 +3,6 @@ package com.banking.proBanker.Controller;
 import com.banking.proBanker.Service.DashboardService;
 import com.banking.proBanker.Utilities.JsonUtil;
 import com.banking.proBanker.Utilities.LoggedinUser;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
