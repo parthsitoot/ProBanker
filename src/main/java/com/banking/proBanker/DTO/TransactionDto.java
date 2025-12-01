@@ -10,7 +10,6 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class TransactionDto {
     private Long id;
     private double amount;

@@ -3,7 +3,6 @@ package com.banking.proBanker.Service;
 import com.banking.proBanker.Entity.OtpInfo;
 import com.banking.proBanker.Exceptions.AccountDoesNotExistException;
 import com.banking.proBanker.Exceptions.InvalidOtpException;
-import com.banking.proBanker.Exceptions.InvalidTokenException;
 import com.banking.proBanker.Exceptions.OtpRetryLimitExceededException;
 import com.banking.proBanker.Repository.OtpInfoRepository;
 import com.banking.proBanker.Utilities.ApiMessages;
