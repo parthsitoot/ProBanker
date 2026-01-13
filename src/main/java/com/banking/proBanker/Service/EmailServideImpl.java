@@ -62,8 +62,6 @@ public class EmailServideImpl implements EmailService{
                 + "<p>Need help? Contact our support team:</p>"
                 + "<p>Email: <a href=\"mailto:onestopbank@google.com\" style=\"color: #3f51b5; text-decoration: none;\">onestopbank@google.com</a></p>"
                 + "<div style=\"margin-top: 20px;\">"
-                + "<p style=\"font-size: 1em; color: #333;\">Show your support here</p>"
-                + "<a href=\"https://github.com/abhi9720/BankingPortal-API\" style=\"margin: 0 10px; color: #3f51b5; text-decoration: none;\">GitHub</a>"
                 + "</div>" + "</div>" + "</div>" + "</div>";
     }
 
@@ -87,8 +85,6 @@ public class EmailServideImpl implements EmailService{
                 + "<p>Need help? Contact our support team:</p>"
                 + "<p>Email: <a href=\"mailto:onestopbank@google.com\" style=\"color: #3f51b5; text-decoration: none;\">onestopbank@google.com</a></p>"
                 + "<div style=\"margin-top: 20px;\">"
-                + "<p style=\"font-size: 1em; color: #333;\">Show your support here</p>"
-                + "<a href=\"https://github.com/abhi9720/BankingPortal-API\" style=\"margin: 0 10px; color: #3f51b5; text-decoration: none;\">GitHub</a>"
                 + "</div>" + "</div>" + "</div>" + "</div>";
     }
 }

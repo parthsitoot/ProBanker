@@ -11,8 +11,26 @@ services:
   server:
     build:
       context: .
+      dockerfile: dockerfile
+    image: probanker-server
+    container_name: probanker-server
     ports:
-      - 8180:8180
+      - "8180:8180"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xms256m -Xmx512m
+
+    restart: unless-stopped
+    healthcheck:
+      test: ["executable", "arg"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
