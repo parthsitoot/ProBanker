@@ -73,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
 
         if (newPin == null || newPin.isEmpty()) {
             throw new InvalidPinException(ApiMessages.PIN_INVALID_ERROR.getMessage());
-        } else if (newPin.matches("[0-9]{4}")){
+        } else if (!newPin.matches("[0-9]{4}")){
             throw new InvalidPinException(ApiMessages.PIN_INVALID_ERROR.getMessage());
         }
         val account = accountRepository.findByAccountNumber(accountNumber);
