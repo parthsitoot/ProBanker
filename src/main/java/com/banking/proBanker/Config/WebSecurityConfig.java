@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -30,13 +31,13 @@ import lombok.RequiredArgsConstructor;
 public class WebSecurityConfig {
 
     private static final String[] PUBLIC_URLS = {
-            "/api/users/register",
-            "/api/users/login",
-            "/api/auth/password-reset/verify-otp",
-            "/api/auth/password-reset/send-otp",
-            "/api/auth/password-reset",
-            "/api/users/generate-otp",
-            "/api/users/verify-otp",
+            "/api/user/register",
+            "/api/user/login",
+            "/api/authentication/password-reset/verify-otp",
+            "/api/authentication/password-reset/send-otp",
+            "/api/authentication/password-reset",
+            "/api/user/generate-otp",
+            "/api/user/verify-otp",
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -66,7 +67,8 @@ public class WebSecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

@@ -23,9 +23,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
-    private static TransactionRepository transactionRepository;
-    private static AccountRepository accountRepository;
-    private static PasswordEncoder passwordEncoder;
+    private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Account createAccount(User user) {
@@ -146,7 +146,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //External Functions
-    private static String generateUniqueAccountNumber() {
+    private String generateUniqueAccountNumber() {
         String accountNumber = "";
         do {
             //generate UUID as the accountNumber
@@ -156,7 +156,7 @@ public class AccountServiceImpl implements AccountService {
         return accountNumber;
     }
 
-    private static void validatePassword (String accountNumber, String password) {
+    private void validatePassword (String accountNumber, String password) {
         val account = accountRepository.findByAccountNumber(accountNumber);
         if (account == null) {
             throw new NotFoundException(ApiMessages.ACCOUNT_NOT_FOUND.getMessage());
@@ -171,7 +171,7 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private static void validatePin (String accountNumber, String pin) {
+    private void validatePin (String accountNumber, String pin) {
         val account = accountRepository.findByAccountNumber(accountNumber);
         if (account == null) {
             throw new NotFoundException(ApiMessages.ACCOUNT_NOT_FOUND.getMessage());

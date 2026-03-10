@@ -51,14 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             logger.info ("User is already authenticated");
-
             filterChain.doFilter(request, response);
+            return;
         }
 
         val requestTokenHeader = request.getHeader("Authorization");
 
         if (requestTokenHeader == null) {
             filterChain.doFilter(request, response);
+            return;
         }
 
         if (!requestTokenHeader.startsWith("Bearer ")) {

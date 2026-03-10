@@ -1,0 +1,152 @@
+.statement-card {
+  border-radius: 32px;
+  padding: 32px;
+}
+
+.statement-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statement-header p:last-child {
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.statement-summary {
+  min-width: 150px;
+  border-radius: 22px;
+  background: rgba(13, 92, 70, 0.08);
+  color: var(--accent);
+  padding: 16px 18px;
+}
+
+.statement-summary span {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.statement-summary strong {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+}
+
+.filter-section {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.filter-btn {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(33, 42, 37, 0.12);
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 11px 16px;
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #f7fbf7;
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.transaction-item {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  border-radius: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.64);
+  border: 1px solid rgba(33, 42, 37, 0.08);
+}
+
+.transaction-item.transaction-credit {
+  background: linear-gradient(90deg, rgba(28, 124, 84, 0.08), rgba(255, 255, 255, 0.62));
+}
+
+.transaction-item.transaction-debit {
+  background: linear-gradient(90deg, rgba(154, 60, 47, 0.08), rgba(255, 255, 255, 0.62));
+}
+
+.transaction-type-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--panel-muted);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.transaction-type,
+.transaction-amount {
+  font-weight: 800;
+}
+
+.transaction-date,
+.transaction-description,
+.transaction-account,
+.balance-after,
+.no-transactions p {
+  color: var(--muted);
+}
+
+.transaction-details {
+  min-width: 0;
+}
+
+.transaction-description,
+.transaction-account {
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.transaction-amount-container {
+  text-align: right;
+}
+
+.transaction-amount.transaction-credit {
+  color: var(--success);
+}
+
+.transaction-amount.transaction-debit {
+  color: var(--danger);
+}
+
+.no-transactions {
+  padding: 56px 18px;
+  text-align: center;
+}
+
+@media (max-width: 780px) {
+  .statement-card {
+    padding: 22px;
+  }
+
+  .statement-header,
+  .transaction-item {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-amount-container {
+    text-align: left;
+  }
+}

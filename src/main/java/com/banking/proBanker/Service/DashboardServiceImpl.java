@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
-    private static UserRepository userRepository;
-    private static AccountRepository accountRepository;
+    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     public UserResponse getUserDetails(String accoutNumber) {

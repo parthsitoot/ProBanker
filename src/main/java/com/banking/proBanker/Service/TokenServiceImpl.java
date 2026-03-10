@@ -28,7 +28,7 @@ public class TokenServiceImpl implements TokenService{
     private String secret;
 
     @Value("${jwt.expiration}")
-    private String expiration;
+    private long expiration;
 
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;

@@ -21,6 +21,7 @@ config.properties
 *.ipr
 
 ### NetBeans ###
+/practicals
 /nbproject/private/
 /nbbuild/
 /dist/

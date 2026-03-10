@@ -8,10 +8,30 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
+  db:
+    image: mysql:8.4
+    container_name: probanker-db
+    environment:
+      MYSQL_DATABASE: bankingapp
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
   server:
+    depends_on:
+      db:
+        condition: service_healthy
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     image: probanker-server
     container_name: probanker-server
     ports:
@@ -19,18 +39,19 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - JAVA_OPTS=-Xms256m -Xmx512m
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/bankingapp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
 
     restart: unless-stopped
-    healthcheck:
-      test: ["executable", "arg"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+
+volumes:
+  mysql-data:
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
@@ -64,4 +85,3 @@ services:
 # secrets:
 #   db-password:
 #     file: db/password.txt
-
